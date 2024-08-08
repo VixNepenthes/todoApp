@@ -1,0 +1,375 @@
+/* Reset normal */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+@keyframes chibi-dancing {
+  0% {
+    bottom: 0px;
+  }
+  25% {
+    bottom: 25px;
+  }
+  50% {
+    bottom: 50px;
+  }
+
+  75% {
+    bottom: 25px;
+  }
+
+  100% {
+    bottom: 0px;
+  }
+}
+
+@keyframes chibi-jumping {
+  0% {
+    bottom: 0px;
+  }
+  25% {
+    bottom: 25px;
+  }
+  50% {
+    bottom: 50px;
+  }
+  75% {
+    bottom: 25px;
+  }
+  100% {
+    bottom: 0px;
+  }
+}
+@keyframes chibi-swinging {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(45deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(-45deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes chibi-angrying {
+  0% {
+    bottom: 50px;
+  }
+  25% {
+    bottom: -50px;
+  }
+  50% {
+    bottom: 50px;
+  }
+  75% {
+    bottom: -50px;
+  }
+  100% {
+    bottom: 0px;
+  }
+}
+
+@keyframes videv-colortransform {
+  0% {
+    color: rgba(227, 68, 29, 0.981);
+  }
+  25% {
+    color: rgba(240, 207, 18, 0.981);
+  }
+  50% {
+    color: rgba(70, 240, 18, 0.981);
+  }
+  75% {
+    color: rgba(18, 210, 240, 0.981);
+  }
+  100% {
+    color: rgba(221, 18, 240, 0.981);
+  }
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  /* overflow: hidden; */
+  padding: 10px;
+  background: linear-gradient(to bottom, #ccee42 0%, #497be8 100%);
+}
+
+.container {
+  background: #fff;
+  max-width: 800px;
+  width: 100%;
+  margin: 120px auto;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  max-height: 500px;
+}
+.main-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  border: 1px solid black;
+}
+
+.notif-user {
+  align-self: flex-start;
+  align-items: center;
+  display: flex;
+  position: absolute;
+  right: 160px;
+  min-width: 250px;
+}
+.notif-user p {
+  animation: videv-colortransform 5s linear infinite alternate;
+}
+#logout-btn {
+  border: none;
+  background: #8e49e8;
+  color: white;
+  width: 40px;
+  height: 40px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  border: none;
+  outline: none;
+  font-weight: 400;
+  font-size: 16px;
+  margin-left: 5px;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.6;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+#logout-btn::hover {
+  background: #721ce3;
+}
+#logout-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.form-auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  height: 100%;
+}
+#form-login {
+  display: none;
+}
+
+#form-register {
+}
+
+input[type='text'],
+input[type='password'] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+.ask-user {
+  display: flex;
+  justify-content: flex-start;
+  justify-items: center;
+  align-items: center;
+}
+
+.title-form-login {
+  margin-bottom: 0px;
+}
+
+.title-form-register {
+  margin-bottom: 0px;
+}
+
+.img-form {
+  max-height: 300px;
+  position: relative;
+  left: 50px;
+}
+
+.btn-submit {
+  margin-top: 20px;
+  min-width: 80px;
+  background-color: #ccee42;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+.btn-submit:hover {
+  opacity: 0.8;
+}
+
+.link-form {
+  cursor: pointer;
+  padding-left: 10px;
+  font-size: 18px;
+  color: red;
+  border: none;
+  background-color: white;
+}
+
+#ask-user-login {
+  display: none;
+}
+
+#ask-user-register {
+}
+
+.main-content {
+  display: none;
+}
+
+.wrapper {
+  max-width: 400px;
+  width: 100%;
+  margin: 120px auto;
+  padding: 25px;
+  border-radius: 5px;
+  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+.wrapper header {
+  font-size: 30px;
+  font-weight: 600;
+  animation: videv-colortransform 5s linear infinite alternate;
+}
+
+.wrapper .input-todo {
+  margin: 20px 0;
+  width: 100%;
+  display: flex;
+  height: 45px;
+}
+
+.input-todo {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-todo input {
+  width: 85%;
+  height: 100%;
+  outline: none;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  font-size: 17px;
+  padding-left: 15px;
+  transition: all 0.3s ease;
+}
+.input-todo input:focus {
+  border-color: #8e49e8;
+}
+#add-task-btn {
+  width: 50px;
+  height: 100%;
+  border: none;
+  color: #fff;
+  margin-left: 5px;
+  font-size: 21px;
+  outline: none;
+  background: #8e49e8;
+  cursor: pointer;
+  border-radius: 3px;
+  opacity: 0.6;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+#add-task-btn:hover,
+.footer button:hover {
+  background: #721ce3;
+}
+#add-task-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.wrapper .todo-list {
+  max-height: 250px;
+  overflow-y: auto;
+}
+.todo-list {
+  min-width: 100%;
+}
+.todo-list li {
+  position: relative;
+  list-style: none;
+  min-width: 100%;
+  margin-bottom: 8px;
+  background: #f2f2f2;
+  border-radius: 3px;
+  padding: 10px 15px;
+  cursor: default;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+.todo-list li .icon {
+  position: absolute;
+  right: -45px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #e74c3c;
+  width: 45px;
+  text-align: center;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 0 3px 3px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.todo-list li:hover .icon {
+  right: 0px;
+}
+.wrapper .footer {
+  display: flex;
+  width: 100%;
+  margin-top: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+#delete-alltask-btn {
+  padding: 6px 10px;
+  border-radius: 3px;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-weight: 400;
+  font-size: 16px;
+  margin-left: 5px;
+  background: #8e49e8;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.6;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+#delete-alltask-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+}

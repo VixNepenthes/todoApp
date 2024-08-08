@@ -3,9 +3,107 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>todoAppByVidev</title>
   </head>
   <body>
-    <h1>Hello World</h1>
+    <div class="container">
+      <!-- Form login/register -->
+      <div class="main-form">
+        <form id="form-login" class="form-auth">
+          <h1 class="title-form-login">Login</h1>
+          <div>
+            <label for="email"
+              ><i class="fa-solid fa-envelope"></i> Email:</label
+            ><br />
+            <input type="text" id="email-login" name="email" /><br />
+          </div>
+          <div>
+            <label for="password">Password:</label><br />
+            <input type="password" id="pwd-login" name="pwd" />
+          </div>
+          <label>
+            <input type="checkbox" value="isRememberMe" id="rememberMe" />
+            Remember me
+          </label>
+          <button id="btn-login" class="btn-submit" type="submit">Login</button>
+        </form>
+        <form id="form-register" class="form-auth">
+          <h1 class="title-form-register">Register</h1>
+          <div>
+            <label for="email"
+              ><i class="fa-solid fa-envelope"></i> Email:</label
+            ><br />
+            <input type="text" id="email-register" name="email" /><br />
+          </div>
+          <div>
+            <label for="password">Password:</label><br />
+            <input type="password" id="pwd-register" name="pwd" />
+          </div>
+          <div>
+            <label for="password">Re-Password:</label><br />
+            <input type="password" id="rePwd" name="rePwd" />
+          </div>
+          <button id="btn-register" class="btn-submit" type="submit">
+            Register
+          </button>
+        </form>
+        <div id="ask-user-login" class="ask-user">
+          <p>Haven't owned account?</p>
+          <button id="link-change-form-login" class="link-form">
+            Register
+          </button>
+        </div>
+        <div id="ask-user-register" class="ask-user">
+          <p>Already have account?</p>
+          <button id="link-change-form-register" class="link-form">
+            Login
+          </button>
+        </div>
+      </div>
+      <!-- Form todoApp -->
+      <div class="main-content">
+        <div class="wrapper">
+          <header>Todo App</header>
+          <div class="input-todo">
+            <input type="text" placeholder="Thêm việc cần làm" />
+            <button id="add-task-btn"><i class="fas fa-plus"></i></button>
+          </div>
+          <ul class="todo-list">
+            <!-- dữ liệu được trả về qua local Storage -->
+          </ul>
+          <div class="footer">
+            <span
+              >Bạn đang có <span class="pending-task"></span> mục đang chờ</span
+            >
+            <button id="delete-alltask-btn">Xoá hết</button>
+          </div>
+        </div>
+      </div>
+      <!-- image for fun -->
+      <img class="img-form" src="/assets/chibi.png" alt="chibi" />
+
+      <div class="notif-user">
+        <p>Hello user: <span id="user-active"></span></p>
+        <button id="logout-btn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+    <script src="index.js"></script>
   </body>
 </html>
