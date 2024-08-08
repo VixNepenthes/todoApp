@@ -11,7 +11,10 @@ const askUserRegister = $('#ask-user-register');
 const askUserLogin = $('#ask-user-login');
 const rmCheck = $('#rememberMe');
 const emailInputLogin = $('#email-login');
+const pwdLoginField = $('#pwd-login');
 const emailInputRegister = $('#email-register');
+const pwdRegisterField = $('#pwd-register');
+const rePwd = $('#rePwd');
 const imgChibi = $('.img-form');
 const notifUser = $('.notif-user');
 const userActive = $('#user-active');
@@ -21,7 +24,6 @@ const addTodoBtn = $('.input-todo button');
 const deleteAllBtn = $('#delete-alltask-btn');
 const pendingTasksCount = $('.pending-task');
 const todoList = $('.todo-list');
-// imgChibi.style.animation = 'chibi-jumping 2s linear 0s 1 normal none';
 const validateEmail = (email) => {
   return email.match(
     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -61,7 +63,12 @@ const loadListTodo = () => {
   if (listTodo?.items.length > 0) {
     //if array length is greater than 0
     listTodo.items.forEach((element, index) => {
-      newLiTag += `<li>${element}
+      newLiTag += `<li>
+      
+        <p class="todo-name-${index}">${element}</p>
+        <span class ="icon icon-edit" onclick="editTask(${index},'${listTodo.email}')">
+        <i class="fa-solid fa-pen-to-square"></i>
+        </span>
         <span class="icon" onclick="deleteTask(${index},'${listTodo.email}')">
             <i class="fas fa-trash"></i>
         </span>
@@ -97,6 +104,26 @@ const deleteTask = (index, email = userActive.innerHTML) => {
   // });
 };
 
+const editTask = (index, email = userActive.innerHTML) => {
+  const todoItem = $(`.todo-name-${index}`);
+  const listTodo = listTodos.find((listTodo) => listTodo.email == email);
+  if (listTodo) {
+    const existingValue = listTodo.items[index];
+    const inputElement = document.createElement('input');
+    inputElement.value = existingValue;
+    todoItem.replaceWith(inputElement);
+    inputElement.focus();
+    inputElement.addEventListener('blur', () => {
+      const updatedValue = inputElement.value.trim();
+      if (updatedValue) {
+        listTodo.items[index] = updatedValue;
+        localStorage.setItem('newTodos', JSON.stringify(listTodos));
+        loadListTodo();
+      }
+    });
+  }
+};
+
 deleteAllBtn.addEventListener('click', () => {
   if (confirm('Delete All?')) {
     var listTodo = listTodos.find(
@@ -116,32 +143,55 @@ deleteAllBtn.addEventListener('click', () => {
 
 registerForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  let password = document.getElementById('pwd-register').value;
-  let rePassword = document.getElementById('rePwd').value;
-  if (password != rePassword) {
+
+  if (pwdRegisterField.value != rePwd.value) {
     alert('Please re-enter the password!');
+    pwdRegisterField.value = '';
+    rePwd.value = '';
     return;
   }
   if (!validateEmail(emailInputRegister.value)) {
     alert('Please enter correctly email!');
+    emailInputRegister.value = '';
+    pwdRegisterField.value = '';
+    rePwd.value = '';
+    return;
+  }
+  const userCheck = users.find(
+    (user) => user.email == emailInputRegister.value
+  );
+  if (userCheck) {
+    alert('Already have this email registered!');
+    emailInputRegister.value = '';
+    pwdRegisterField.value = '';
+    rePwd.value = '';
     return;
   }
 
-  const user = {
+  const newUser = {
     email: emailInputRegister.value,
-    password: password,
+    password: pwdRegisterField.value,
   };
-  users.push(user);
+  users.push(newUser);
   localStorage.setItem('users', JSON.stringify(users));
   alert('Register success!');
+  emailInputRegister.value = '';
+  pwdRegisterField.value = '';
+  rePwd.value = '';
   linkChangeFormRegister.click();
 });
 
 loginForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  let password = document.getElementById('pwd-login').value;
+  if (!validateEmail(emailInputLogin.value)) {
+    alert('Please enter correctly email!');
+    return;
+  }
+
   var user = users.find(
-    (user) => user.email == emailInputLogin.value && user.password == password
+    (user) =>
+      user.email == emailInputLogin.value &&
+      user.password == pwdLoginField.value
   );
   if (user) {
     if (rmCheck.checked && emailInputLogin.value !== '') {
@@ -158,9 +208,14 @@ loginForm.addEventListener('submit', (e) => {
     mainForm.style.display = 'none';
     mainContent.style.display = 'block';
     var email = user.email;
-    document.getElementById('pwd-login').value = '';
+    pwdLoginField.value = '';
     loadUsers(email);
     loadListTodo();
+  } else {
+    alert('User not found or Email/Password incorrect!');
+    emailInputLogin.value = '';
+    pwdLoginField.value = '';
+    return;
   }
 });
 
@@ -222,7 +277,6 @@ addTodoBtn.addEventListener('click', () => {
       email: userActive.innerHTML,
       items: [todoValue],
     };
-    console.log(newItem);
     listTodos.push(newItem);
     localStorage.setItem('newTodos', JSON.stringify(listTodos));
     loadListTodo();

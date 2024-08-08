@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -17,6 +16,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="style.css" />
 
     <title>todoAppByVidev</title>
   </head>
@@ -33,10 +33,12 @@
             <input type="text" id="email-login" name="email" /><br />
           </div>
           <div>
-            <label for="password">Password:</label><br />
+            <label for="password"
+              ><i class="fa-solid fa-key"></i> Password:</label
+            ><br />
             <input type="password" id="pwd-login" name="pwd" />
           </div>
-          <label>
+          <label id="rememberme-checkbox">
             <input type="checkbox" value="isRememberMe" id="rememberMe" />
             Remember me
           </label>
@@ -51,11 +53,15 @@
             <input type="text" id="email-register" name="email" /><br />
           </div>
           <div>
-            <label for="password">Password:</label><br />
+            <label for="password"
+              ><i class="fa-solid fa-key"></i>Password:</label
+            ><br />
             <input type="password" id="pwd-register" name="pwd" />
           </div>
           <div>
-            <label for="password">Re-Password:</label><br />
+            <label for="password"
+              ><i class="fa-solid fa-unlock"></i>Re-Password:</label
+            ><br />
             <input type="password" id="rePwd" name="rePwd" />
           </div>
           <button id="btn-register" class="btn-submit" type="submit">
@@ -95,13 +101,14 @@
         </div>
       </div>
       <!-- image for fun -->
-      <img class="img-form" src="/assets/chibi.png" alt="chibi" />
-
-      <div class="notif-user">
-        <p>Hello user: <span id="user-active"></span></p>
-        <button id="logout-btn">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        </button>
+      <div>
+        <div class="notif-user">
+          <p>Hello user: <span id="user-active"></span></p>
+          <button id="logout-btn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+        <img class="img-form" src="/assets/chibi.png" alt="chibi" />
       </div>
     </div>
     <script src="index.js"></script>
