@@ -93,10 +93,20 @@
             <!-- dữ liệu được trả về qua local Storage -->
           </ul>
           <div class="footer">
-            <span
-              >Bạn đang có <span class="pending-task"></span> mục đang chờ</span
-            >
-            <button id="delete-alltask-btn">Xoá hết</button>
+            <div class="footer__pending-task">
+              <span
+                >Bạn đang có <span class="pending-task"></span> mục đang chờ</span
+              >
+              <button id="delete-alltask-btn">Xoá hết</button>
+            </div>
+            <div class="footer__filter">
+              <label for="">filter :</label>
+              <select id="filter">
+                <option value="all" selected>All</option>
+                <option value="undone">Undone</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -108,7 +118,7 @@
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
           </button>
         </div>
-        <img class="img-form" src="/assets/chibi.png" alt="chibi" />
+        <img class="img-form" src="./assets/chibi.png" alt="chibi" />
       </div>
     </div>
     <script src="index.js"></script>

@@ -1,226 +1,317 @@
-const $ = document.querySelector.bind(document);
-const loginBtn = $('#btn-login');
-const registerBtn = $('#btn-register');
-const registerForm = $('#form-register');
-const loginForm = $('#form-login');
-const mainForm = $('.main-form');
-const mainContent = $('.main-content');
-const linkChangeFormRegister = $('#link-change-form-register');
-const linkChangeFormLogin = $('#link-change-form-login');
-const askUserRegister = $('#ask-user-register');
-const askUserLogin = $('#ask-user-login');
-const rmCheck = $('#rememberMe');
-const emailInputLogin = $('#email-login');
-const pwdLoginField = $('#pwd-login');
-const emailInputRegister = $('#email-register');
-const pwdRegisterField = $('#pwd-register');
-const rePwd = $('#rePwd');
-const imgChibi = $('.img-form');
-const notifUser = $('.notif-user');
-const userActive = $('#user-active');
-const logoutBtn = $('#logout-btn');
-const inputTodo = $('.input-todo input');
-const addTodoBtn = $('.input-todo button');
-const deleteAllBtn = $('#delete-alltask-btn');
-const pendingTasksCount = $('.pending-task');
-const todoList = $('.todo-list');
-const validateEmail = (email) => {
-  return email.match(
+const $ = document.querySelector.bind(document ) ;
+const $$ = document.querySelectorAll.bind(document ) ;
+const loginBtn = $('#btn-login' ) ;
+const registerBtn = $('#btn-register' ) ;
+const registerForm = $('#form-register' ) ;
+const loginForm = $('#form-login' ) ;
+const mainForm = $('.main-form' ) ;
+const mainContent = $('.main-content' ) ;
+const linkChangeFormRegister = $('#link-change-form-register' ) ;
+const linkChangeFormLogin = $('#link-change-form-login' ) ;
+const askUserRegister = $('#ask-user-register' ) ;
+const askUserLogin = $('#ask-user-login' ) ;
+const rememberCheck = $('#rememberMe' ) ;
+const emailInputLogin = $('#email-login' ) ;
+const passwordLoginField = $('#pwd-login' ) ;
+const emailInputRegister = $('#email-register' ) ;
+const pwdRegisterField = $('#pwd-register' ) ;
+const rePasswordField = $('#rePwd' ) ;
+const imageChibi = $('.img-form' ) ;
+const notifUser = $('.notif-user' ) ;
+const userActive = $('#user-active' ) ;
+const logoutBtn = $('#logout-btn' ) ;
+const inputTodo = $('.input-todo input' ) ;
+const addTodoBtn = $('.input-todo button' ) ;
+const deleteAllBtn = $('#delete-alltask-btn' ) ;
+const pendingTasksCount = $( '.pending-task' ) ;
+const todoList = $('.todo-list' ) ;
+const filterStatus = $('#filter' );
+const filterState = {
+  DONE: 'done',
+  UNDONE: 'undone',
+  ALL: 'all'
+}
+
+/**
+ * 
+ * function create unique id. for the time after, we can use
+ * id generated auto by mongoDB (ObjectId) when we catching in BE
+ */
+const generateUID = () => {
+  return Date.now() .toString( 36 )  + Math.random() .toString( 36 ) .substring( 2, 11 ) ;
+};
+
+/**
+ * Some regrex check email properly!
+ */
+const validateEmail = (email ) => {
+  return email.match (
     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   );
 };
+/**
+ * Event DOMContentLoaded trigger when the browser finish load
+ * without waiting for stylesheets, images, and subframes
+ * => using to detech whether a user logged or user using rememberMe
+ * localStorage to save the user permanently
+ * sessionStorage to save the user for only one session & one tab browser 
+ */
 
-const loadUsers = (email = '') => {
-  var users = JSON.parse(localStorage.getItem('users') || '[]');
-  var userActiveEmail = email;
-  if (localStorage.checkbox && localStorage.checkbox !== '') {
-    rmCheck.setAttribute('checked', 'checked');
-    emailInputLogin.value = localStorage.emailRemembered;
+/**
+ * Improve than ver 1, instead using email like primary key of listTodo
+ * in ver 2, task can store independently directly in localStorage
+ * When we use query, simply using user_id (id of user) like the
+ * foreign key to filter tasks to take array task
+ * And easily add new task more than ver 1
+ * we don't need to check if user exist / user created task yet
+ * just add new task, who add task then give lil task a credential
+ * property is user_id with value is user.id
+ */
+var users, user, listTask
+window.addEventListener('load', ()  => {
+  const rememberedUser = JSON.parse(localStorage.getItem("rememberedUser"));
+  const currentSessionUser = JSON.parse(sessionStorage.getItem("currentSessionUser"));
+  if ( rememberedUser || currentSessionUser ) {
+    // display page Login / Signup to none
+    mainForm.style.display = 'none';
+    // display toDoApp
+    mainContent.style.display = 'block';
+    // loading current user & toDoTask ( when using react => useEffect())
+    user = rememberedUser || currentSessionUser;
+    users = loadUsers() ;
+    helloUser(user )
+    listTask= loadTask(user ) ;
+    renderTask( listTask );
   } else {
-    rmCheck.removeAttribute('checked');
-    emailInputLogin.value = '';
+    users = loadUsers() ;
+    helloUser( user );
+    console.log(user);
+
   }
-  if (userActiveEmail != '') {
+}) ;
+
+const loadUsers = () => {
+  var users = JSON.parse( localStorage.getItem( 'users' )  || '[  ]' ) ;
+  return users;
+};
+
+const helloUser = (user = '' ) => {
+  if (user )  {
     notifUser.style.display = 'flex';
-    logoutBtn.classList.add('active');
-    userActive.innerHTML = userActiveEmail;
+    logoutBtn.classList.add( 'active' ) ;
+    userActive.innerHTML = user?.email;
   } else {
     notifUser.style.display = 'none';
-
-    logoutBtn.classList.remove('active');
+    logoutBtn.classList.remove( 'active' ) ;
     userActive.innerHTML = '';
   }
-  return { users, userActiveEmail };
+}
+
+const loadTask = ()  => {
+  var listTask = JSON.parse(localStorage.getItem('listTask' )  || '[]' ) ;
+  return listTask;
 };
 
-const loadListTodo = () => {
-  var listTodos = JSON.parse(localStorage.getItem('newTodos') || '[]');
-  var listTodo = listTodos.find(
-    (listTodo) => listTodo.email == userActive.innerHTML
-  );
-  var newLiTag = '';
-  pendingTasksCount.textContent = listTodo?.items.length || 0;
-  if (listTodo?.items.length > 0) {
-    //if array length is greater than 0
-    listTodo.items.forEach((element, index) => {
-      newLiTag += `<li>
-      
-        <p class="todo-name-${index}">${element}</p>
-        <span class ="icon icon-edit" onclick="editTask(${index},'${listTodo.email}')">
-        <i class="fa-solid fa-pen-to-square"></i>
-        </span>
-        <span class="icon" onclick="deleteTask(${index},'${listTodo.email}')">
-            <i class="fas fa-trash"></i>
-        </span>
-        </li>`;
-    });
-    deleteAllBtn.classList.add('active'); //active the delete button
+/**
+ * Depend on filterStatus value, we choose task to render!
+ */
+filterStatus.addEventListener('change', ()=> {
+  const filterStatusValue = filterStatus.value
+  console.log(filterStatusValue)
+  if (filterStatusValue === filterState.DONE ) {
+    renderTask(listTask.filter((task )=>
+      task.completed == filterState.DONE ))
+  } else if (filterStatusValue == filterState.UNDONE) {
+    renderTask(listTask.filter((task )=> 
+      task.completed == filterState.UNDONE ))
   } else {
-    deleteAllBtn.classList.remove('active'); //unactive the delete button
+    renderTask(listTask )
   }
+})
 
-  todoList.innerHTML = newLiTag; //adding new li tag inside ul tag
-  inputTodo.value = ''; //once task added leave the input field blank
-  return listTodos;
-};
-var { users, userActiveEmail } = loadUsers();
-var listTodos = loadListTodo();
-
-const deleteTask = (index, email = userActive.innerHTML) => {
-  const listTodo = listTodos.find((listTodo) => listTodo.email == email);
-  if (listTodo) {
-    listTodo.items.splice(index, 1);
-    localStorage.setItem('newTodos', JSON.stringify(listTodos));
-    loadListTodo();
+const renderTask = (listTask ) => {
+  if(listTask ) {
+    var tasks = listTask.filter( 
+      (task ) => task.user_id == user.id
+    ) ;
   }
+  pendingTasksCount.textContent = tasks?.length || 0;
+  if (tasks?.length > 0 ) {
+    todoList.innerHTML = tasks.map((item ) => {
+      return `<li>
+          <div class="id-${item.id }">
+            <input onchange="toggleCompleted('${item.id }')" 
+            type="checkbox" ${item.completed == filterState.DONE ? 'checked' : '' }>
+            <p>${item.name }</p>
+            <span class ="icon icon-edit" onclick="editTask('${item.id }') ">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </span>
+            <span class="icon" onclick="deleteTask('${item.id }') ">
+              <i class="fas fa-trash"></i>
+            </span>
+          </div>
+        </li>`
+    })
+    .join('' );
+    deleteAllBtn.classList.add('active' )
+  } else {
+    todoList.innerHTML = `Nothing to show here. Please add task`
+    deleteAllBtn.classList.remove('active' )
 
-  // listTodos.forEach((listTodo) => {
-  //   if (listTodo.email == email) {
-  //     listTodo.items.splice(index, 1);
-  //     localStorage.setItem('newTodos', JSON.stringify(listTodos));
-
-  //     loadListTodo(); //call the showTasks function
-  //   }
-  // });
-};
-
-const editTask = (index, email = userActive.innerHTML) => {
-  const todoItem = $(`.todo-name-${index}`);
-  const listTodo = listTodos.find((listTodo) => listTodo.email == email);
-  if (listTodo) {
-    const existingValue = listTodo.items[index];
-    const inputElement = document.createElement('input');
-    inputElement.value = existingValue;
-    todoItem.replaceWith(inputElement);
-    inputElement.focus();
-    inputElement.addEventListener('blur', () => {
-      const updatedValue = inputElement.value.trim();
-      if (updatedValue) {
-        listTodo.items[index] = updatedValue;
-        localStorage.setItem('newTodos', JSON.stringify(listTodos));
-        loadListTodo();
-      }
-    });
   }
-};
+}
 
-deleteAllBtn.addEventListener('click', () => {
-  if (confirm('Delete All?')) {
-    var listTodo = listTodos.find(
-      (listTodo) => listTodo.email == userActive.innerHTML
-    );
-    if (listTodo) {
-      listTodo.items = [];
+const toggleCompleted = (id ) => {
+  const task = listTask.find((task ) => task.id == id)
+  if( task ) {
+    if(task.completed == filterState.UNDONE ){
+      task.completed = filterState.DONE
+    } else if(task.completed == filterState.DONE) {
+      task.completed = filterState.UNDONE
     }
-    localStorage.setItem('newTodos', JSON.stringify(listTodos));
-    loadListTodo();
-    imgChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
-    setTimeout(() => {
-      imgChibi.style.animation = '';
-    }, 3100);
+    localStorage.setItem('listTask', JSON.stringify(listTask ))
+    listTask = loadTask(user )
+    
   }
-});
+}
 
-registerForm.addEventListener('submit', (e) => {
-  e.preventDefault();
+const deleteTask = (id )  => {
+  const updatedListTask = listTask.filter((task ) => task.id !== id)
+  if (updatedListTask )  {
+    localStorage.setItem('listTask', JSON.stringify(updatedListTask ));
+    listTask = loadTask(user );
+    renderTask(listTask )
+  }
+};
 
-  if (pwdRegisterField.value != rePwd.value) {
-    alert('Please re-enter the password!');
+const editTask = (id )  => {
+  const todoItem = $(`.id-${id}` ) ;
+  const task = listTask.find((task ) => task.id == id ) ;
+  if (task )  {
+    const existingValue = task.name;
+    //create input field by using document.createElement( 'input' )
+    const inputElement = document.createElement('input' ) ; 
+    // Assign value of the input field exactly the name task
+    inputElement.value = existingValue;
+    // replace input field in place name for user change
+    todoItem.replaceWith(inputElement ) ;
+    inputElement.focus() ;
+    /**
+     *  blur trigger when mouse point out of element 
+     *  take the value in inputField and update
+     */
+    inputElement.addEventListener('blur', ()  => {
+      const updatedValue = inputElement.value.trim() ;
+      if (updatedValue )  {
+        task.name = updatedValue;
+        localStorage.setItem(  'listTask', JSON.stringify( listTask )  ) ;
+        listTask = loadTask(user ) ;
+        renderTask(listTask )
+      }
+    }) ;
+  }
+};
+
+deleteAllBtn.addEventListener('click', ()  => {
+  if (confirm('Delete All?' ))  {
+    var updatedListTask = listTask.filter( 
+      (task )  => task.user_id !== user.id
+     ) ;
+    if (updatedListTask )  {
+      imageChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
+      setTimeout( ()  => {
+        imageChibi.style.animation = '';
+      }, 3100 ) ;
+      localStorage.setItem( 'listTask', JSON.stringify(updatedListTask ))
+      listTask = loadTask(user )
+      renderTask(listTask )
+    }
+  }
+}) ;
+
+registerForm.addEventListener('submit', (e )  => {
+  e.preventDefault() ;
+
+  if (pwdRegisterField.value != rePasswordField.value )  {
+    alert('Please re-enter the password!' ) ;
     pwdRegisterField.value = '';
-    rePwd.value = '';
+    rePasswordField.value = '';
     return;
   }
-  if (!validateEmail(emailInputRegister.value)) {
-    alert('Please enter correctly email!');
+  console.log(emailInputRegister.value )
+  if (!validateEmail( emailInputRegister.value ))  {
+    alert('Please enter correctly email!' ) ;
     emailInputRegister.value = '';
     pwdRegisterField.value = '';
-    rePwd.value = '';
+    rePasswordField.value = '';
     return;
   }
-  const userCheck = users.find(
-    (user) => user.email == emailInputRegister.value
-  );
-  if (userCheck) {
-    alert('Already have this email registered!');
+  const userCheck = users.find( 
+    (user )  => user.email == emailInputRegister.value
+   ) ;
+  if (userCheck )  {
+    alert('Already have this email registered!' ) ;
     emailInputRegister.value = '';
     pwdRegisterField.value = '';
-    rePwd.value = '';
+    rePasswordField.value = '';
     return;
   }
 
   const newUser = {
+    id: generateUID() ,
     email: emailInputRegister.value,
     password: pwdRegisterField.value,
   };
-  users.push(newUser);
-  localStorage.setItem('users', JSON.stringify(users));
-  alert('Register success!');
+  users.push(newUser ) ;
+  localStorage.setItem('users', JSON.stringify( users )  ) ;
+  alert('Register success!' ) ;
   emailInputRegister.value = '';
   pwdRegisterField.value = '';
-  rePwd.value = '';
-  linkChangeFormRegister.click();
-});
+  rePasswordField.value = '';
+  linkChangeFormRegister.click() ;
+} ) ;
 
-loginForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (!validateEmail(emailInputLogin.value)) {
-    alert('Please enter correctly email!');
+loginForm.addEventListener('submit', (e  )  => {
+  e.preventDefault() ;
+  if (!validateEmail( emailInputLogin.value ))  {
+    alert( 'Please enter correctly email!' ) ;
     return;
   }
-
-  var user = users.find(
-    (user) =>
+  // check if the user found in database => fetch api in here
+  var userCheck = users.find ( 
+    (user )  =>
       user.email == emailInputLogin.value &&
-      user.password == pwdLoginField.value
-  );
-  if (user) {
-    if (rmCheck.checked && emailInputLogin.value !== '') {
-      localStorage.emailRemembered = emailInputLogin.value;
-      localStorage.checkbox = rmCheck.value;
+      user.password == passwordLoginField.value
+   ) ;
+  if (userCheck )  {
+    user = userCheck
+    if (rememberCheck.checked )  {
+      localStorage.setItem('rememberedUser', JSON.stringify(user )) ;
+      sessionStorage.removeItem('currentSessionUser' );
     } else {
-      localStorage.emailRemembered = '';
-      localStorage.checkbox = '';
+      sessionStorage.setItem('currentSessionUser', JSON.stringify(user ))
+      localStorage.removeItem('rememberedUser' );
     }
-    imgChibi.style.animation = 'chibi-jumping 3s linear 0s 1 normal none';
-    setTimeout(() => {
-      imgChibi.style.animation = '';
-    }, 3100);
+    imageChibi.style.animation = 'chibi-jumping 3s linear 0s 1 normal none';
+    setTimeout( ()  => {
+      imageChibi.style.animation = '';
+    } , 3100 ) ;
     mainForm.style.display = 'none';
     mainContent.style.display = 'block';
-    var email = user.email;
-    pwdLoginField.value = '';
-    loadUsers(email);
-    loadListTodo();
+    passwordLoginField.value = '';
+    helloUser(user );
+    listTask = loadTask(user ) ;
+    renderTask(listTask )
   } else {
-    alert('User not found or Email/Password incorrect!');
+    alert('User not found or Email/Password incorrect!'  ) ;
     emailInputLogin.value = '';
-    pwdLoginField.value = '';
+    passwordLoginField.value = '';
     return;
   }
-});
+} ) ;
 
-linkChangeFormRegister.addEventListener('click', () => {
-  if (registerForm.style.display != 'none') {
+const checkAvailableFormAndDisplay = () => {
+  if (registerForm.style.display != 'none' )  {
     registerForm.style.display = 'none';
     askUserRegister.style.display = 'none';
     loginForm.style.display = 'flex';
@@ -231,96 +322,58 @@ linkChangeFormRegister.addEventListener('click', () => {
     registerForm.style.display = 'flex';
     askUserRegister.style.display = 'flex';
   }
-});
+}
 
-linkChangeFormLogin.addEventListener('click', () => {
-  if (registerForm.style.display != 'none') {
-    registerForm.style.display = 'none';
-    askUserRegister.style.display = 'none';
-    askUserLogin.style.display = 'flex';
-    loginForm.style.display = 'flex';
+linkChangeFormRegister.addEventListener('click', ()  => {
+  checkAvailableFormAndDisplay()
+} ) ;
 
-    loginForm.style.display = 'flex';
+linkChangeFormLogin.addEventListener('click', ()  => {
+  checkAvailableFormAndDisplay()
+} ) ;
+
+/**
+ * CSS class active make field input beautiful
+ */
+inputTodo.addEventListener('keyup', ()  => {
+  var enteredValues = inputTodo.value.trim() ;
+  if (enteredValues )  {
+    addTodoBtn.classList.add( 'active' ) ;
   } else {
-    loginForm.style.display = 'none';
-    registerForm.style.display = 'flex';
-    askUserLogin.style.display = 'none';
-    askUserRegister.style.display = 'flex';
+    addTodoBtn.classList.remove( 'active' ) ;
   }
-});
+} ) ;
 
-inputTodo.addEventListener('keyup', () => {
-  var enteredValues = inputTodo.value.trim();
-  if (enteredValues) {
-    addTodoBtn.classList.add('active');
-  } else {
-    addTodoBtn.classList.remove('active');
-  }
-});
-
-addTodoBtn.addEventListener('click', () => {
-  var todoValue = inputTodo.value.trim();
-
-  /**
-   * Ở đây có 3 trường hợp xảy ra:
-   * 1. mảng listTodos rỗng ( không có email, không có items)
-   * => tạo mới 1 object listTodo con gồm email và mảng items chứa phần tử đầu tiên là todoValue
-   * 2. mảng listTodos có phần tử
-   * => kiểm tra email user đang login với email trong từng phần tử listTodos
-   * 2.1 Nếu tồn tại đã có email => thêm todoValue vào mảng items và cập nhật localStorage
-   * 2.2 Nếu không tồn tại email (email vừa đăng ký, chưa từng sử dụng)
-   * => tạo mới 1 object listTodo con gồm email và mảng items chứa phần tử đầu tiên là todoValue
-   */
-  if (listTodos.length == 0) {
-    // Trường hợp 1
-    var newItem = {
-      email: userActive.innerHTML,
-      items: [todoValue],
+/**
+ * Handle event click on button addTask
+ */
+addTodoBtn.addEventListener( 'click', ()  => {
+  var todoValue = inputTodo.value.trim() ;
+    var newTask = {
+      id: generateUID(),
+      name: todoValue,
+      user_id: user.id,
+      completed: filterState.UNDONE
     };
-    listTodos.push(newItem);
-    localStorage.setItem('newTodos', JSON.stringify(listTodos));
-    loadListTodo();
-    addTodoBtn.classList.remove('active');
-    imgChibi.style.animation = 'chibi-swinging 3s linear 0s 1 normal none';
-    setTimeout(() => {
-      imgChibi.style.animation = '';
-    }, 3100);
-  } else {
-    // Trường hợp 2
-    const listTodo = listTodos.find(
-      (listTodo) => listTodo.email == userActive.innerHTML
-    );
-    // 2.1
-    if (listTodo) {
-      listTodo.items.push(todoValue);
-      localStorage.setItem('newTodos', JSON.stringify(listTodos));
-      loadListTodo();
-      addTodoBtn.classList.remove('active');
-      imgChibi.style.animation = 'chibi-swinging 3s linear 0s 1 normal none';
-      setTimeout(() => {
-        imgChibi.style.animation = '';
-      }, 3100);
-    }
-    // 2.2
-    else {
-      var newItem = {
-        email: userActive.innerHTML,
-        items: [todoValue],
-      };
-      listTodos.push(newItem);
-      localStorage.setItem('newTodos', JSON.stringify(listTodos));
-      loadListTodo();
-      addTodoBtn.classList.remove('active');
-      imgChibi.style.animation = 'chibi-swinging 3s linear 0s 1 normal none';
-      setTimeout(() => {
-        imgChibi.style.animation = '';
-      }, 3100);
-    }
-  }
-});
+    listTask.push(newTask ) ;
+    localStorage.setItem('listTask', JSON.stringify( listTask )  ) ;
+    addTodoBtn.classList.remove('active' ) ;
+    imageChibi.style.animation = 'chibi-swinging 3s linear 0s 1 normal none';
+    setTimeout(()  => {
+      imageChibi.style.animation = '';
+    }, 3100 ) ;
+    inputTodo.value = '';
+    listTask = loadTask(user ) ;
+    renderTask(listTask )
+}) ;
 
-logoutBtn.addEventListener('click', () => {
+logoutBtn.addEventListener('click', ()  => {
+  localStorage.removeItem('rememberedUser' );
+  sessionStorage.removeItem('currentSessionUser' );
+  console.log(user )
+  user = ''
+  helloUser();
   mainForm.style.display = 'flex';
   mainContent.style.display = 'none';
-  loadUsers();
-});
+  console.log(user )
+}) ;

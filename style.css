@@ -84,6 +84,7 @@ body {
   background: linear-gradient(to bottom, #ccee42 0%, #497be8 100%);
 }
 
+
 .container {
   background: #fff;
   max-width: 800px;
@@ -315,6 +316,20 @@ input[type='password'] {
   overflow: hidden;
   word-wrap: break-word;
 }
+
+input[type=checkbox] {
+  zoom: 1.5;
+}
+
+.todo-list div {
+  display: flex;
+}
+.todo-list li input{
+  font-size: 18px;
+}
+.todo-list li p{
+  margin-left: 20px;
+}
 .todo-list li .icon {
   position: absolute;
   right: -45px;
@@ -345,6 +360,14 @@ input[type='password'] {
   margin-top: 20px;
   align-items: center;
   justify-content: space-between;
+  flex-direction: column;
+}
+.footer__pending-task{
+  display: flex;
+}
+.footer__filter{
+  font-size: 18px;
+  
 }
 #delete-alltask-btn {
   padding: 6px 10px;
