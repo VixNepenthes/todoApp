@@ -50,7 +50,7 @@ const validateEmail = (email ) => {
   );
 };
 /**
- * Event DOMContentLoaded trigger when the browser finish load
+ * Event DOMContentLoaded/load trigger when the browser finish load
  * without waiting for stylesheets, images, and subframes
  * => using to detech whether a user logged or user using rememberMe
  * localStorage to save the user permanently
@@ -68,7 +68,7 @@ const validateEmail = (email ) => {
  * property is user_id with value is user.id
  */
 var users, user, listTask
-window.addEventListener('load', ()  => {
+window.addEventListener('DOMContentLoaded', ()  => {
   const rememberedUser = JSON.parse(localStorage.getItem("rememberedUser"));
   const currentSessionUser = JSON.parse(sessionStorage.getItem("currentSessionUser"));
   if ( rememberedUser || currentSessionUser ) {
@@ -81,17 +81,15 @@ window.addEventListener('load', ()  => {
     users = loadUsers() ;
     helloUser(user )
     listTask= loadTask(user ) ;
-    renderTask( listTask );
+    renderTask(listTask );
   } else {
     users = loadUsers() ;
-    helloUser( user );
-    console.log(user);
-
+    helloUser(user );
   }
 }) ;
 
 const loadUsers = () => {
-  var users = JSON.parse( localStorage.getItem( 'users' )  || '[  ]' ) ;
+  var users = JSON.parse( localStorage.getItem('users' ) ||'[]' ) ;
   return users;
 };
 
@@ -164,13 +162,15 @@ const renderTask = (listTask ) => {
 const toggleCompleted = (id ) => {
   const task = listTask.find((task ) => task.id == id)
   if( task ) {
-    if(task.completed == filterState.UNDONE ){
+    if(task.completed == filterState.UNDONE){
       task.completed = filterState.DONE
     } else if(task.completed == filterState.DONE) {
       task.completed = filterState.UNDONE
     }
     localStorage.setItem('listTask', JSON.stringify(listTask ))
     listTask = loadTask(user )
+    filterStatus.value = filterState.ALL;
+    filterStatus.dispatchEvent(new Event('change'));
     
   }
 }
@@ -238,7 +238,6 @@ registerForm.addEventListener('submit', (e )  => {
     rePasswordField.value = '';
     return;
   }
-  console.log(emailInputRegister.value )
   if (!validateEmail( emailInputRegister.value ))  {
     alert('Please enter correctly email!' ) ;
     emailInputRegister.value = '';
@@ -269,7 +268,7 @@ registerForm.addEventListener('submit', (e )  => {
   pwdRegisterField.value = '';
   rePasswordField.value = '';
   linkChangeFormRegister.click() ;
-} ) ;
+}) ;
 
 loginForm.addEventListener('submit', (e  )  => {
   e.preventDefault() ;
@@ -324,30 +323,30 @@ const checkAvailableFormAndDisplay = () => {
   }
 }
 
-linkChangeFormRegister.addEventListener('click', ()  => {
+linkChangeFormRegister.addEventListener('click', () => {
   checkAvailableFormAndDisplay()
 } ) ;
 
-linkChangeFormLogin.addEventListener('click', ()  => {
+linkChangeFormLogin.addEventListener('click', () => {
   checkAvailableFormAndDisplay()
 } ) ;
 
 /**
  * CSS class active make field input beautiful
  */
-inputTodo.addEventListener('keyup', ()  => {
+inputTodo.addEventListener('keyup', () => {
   var enteredValues = inputTodo.value.trim() ;
   if (enteredValues )  {
     addTodoBtn.classList.add( 'active' ) ;
   } else {
     addTodoBtn.classList.remove( 'active' ) ;
   }
-} ) ;
+}) ;
 
 /**
  * Handle event click on button addTask
  */
-addTodoBtn.addEventListener( 'click', ()  => {
+addTodoBtn.addEventListener( 'click', () => {
   var todoValue = inputTodo.value.trim() ;
     var newTask = {
       id: generateUID(),
@@ -367,13 +366,11 @@ addTodoBtn.addEventListener( 'click', ()  => {
     renderTask(listTask )
 }) ;
 
-logoutBtn.addEventListener('click', ()  => {
+logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('rememberedUser' );
   sessionStorage.removeItem('currentSessionUser' );
-  console.log(user )
   user = ''
   helloUser();
   mainForm.style.display = 'flex';
   mainContent.style.display = 'none';
-  console.log(user )
 }) ;
