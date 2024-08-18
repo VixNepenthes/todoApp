@@ -18,7 +18,7 @@
     />
     <link rel="stylesheet" href="style.css" />
 
-    <title>todoAppByVidev</title>
+    <title>todoapp</title>
   </head>
   <body>
     <div class="container">
@@ -36,10 +36,10 @@
             <label for="password"
               ><i class="fa-solid fa-key"></i> Password:</label
             ><br />
-            <input type="password" id="pwd-login" name="pwd" />
+            <input type="password" id="password-login" name="password" />
           </div>
           <label id="rememberme-checkbox">
-            <input type="checkbox" value="isRememberMe" id="rememberMe" />
+            <input type="checkbox" value="isRememberme" id="rememberme" />
             Remember me
           </label>
           <button id="btn-login" class="btn-submit" type="submit">Login</button>
@@ -56,13 +56,13 @@
             <label for="password"
               ><i class="fa-solid fa-key"></i>Password:</label
             ><br />
-            <input type="password" id="pwd-register" name="pwd" />
+            <input type="password" id="password-register" name="password-register" />
           </div>
           <div>
             <label for="password"
               ><i class="fa-solid fa-unlock"></i>Re-Password:</label
             ><br />
-            <input type="password" id="rePwd" name="rePwd" />
+            <input type="password" id="re-password-register" name="re-password" />
           </div>
           <button id="btn-register" class="btn-submit" type="submit">
             Register
@@ -86,18 +86,18 @@
         <div class="wrapper">
           <header>Todo App</header>
           <div class="input-todo">
-            <input type="text" placeholder="Thêm việc cần làm" />
+            <input type="text" placeholder="Add task" />
             <button id="add-task-btn"><i class="fas fa-plus"></i></button>
           </div>
           <ul class="todo-list">
-            <!-- dữ liệu được trả về qua local Storage -->
+            <!--data return from localStorage -->
           </ul>
           <div class="footer">
             <div class="footer__pending-task">
               <span
-                >Bạn đang có <span class="pending-task"></span> mục đang chờ</span
+                >You have <span class="pending-task"></span> task</span
               >
-              <button id="delete-alltask-btn">Xoá hết</button>
+              <button id="delete-alltask-btn">Delete all</button>
             </div>
             <div class="footer__filter">
               <label for="">filter :</label>

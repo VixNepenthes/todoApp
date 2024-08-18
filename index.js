@@ -10,12 +10,12 @@ const linkChangeFormRegister = $('#link-change-form-register') ;
 const linkChangeFormLogin = $('#link-change-form-login') ;
 const askUserRegister = $('#ask-user-register') ;
 const askUserLogin = $('#ask-user-login') ;
-const rememberCheck = $('#rememberMe') ;
+const rememberCheck = $('#rememberme') ;
 const emailInputLogin = $('#email-login') ;
-const passwordLoginField = $('#pwd-login') ;
+const passwordLoginField = $('#password-login') ;
 const emailInputRegister = $('#email-register') ;
-const pwdRegisterField = $('#pwd-register') ;
-const rePasswordField = $('#rePwd') ;
+const passwordRegisterField = $('#password-register') ;
+const rePasswordRegisterField = $('#re-password-register') ;
 const imageChibi = $('.img-form') ;
 const notifUser = $('.notif-user') ;
 const userActive = $('#user-active') ;
@@ -31,6 +31,13 @@ const filterState = {
   UNDONE: 'undone',
   ALL: 'all'
 }
+const valueConstant = {
+  none : 'none',
+  null : '',
+  block: 'block',
+  flex: 'flex',
+  active: 'active'
+}
 
 /**
  * 
@@ -38,7 +45,7 @@ const filterState = {
  * id generated auto by mongoDB (ObjectId) when we catching in BE
  */
 function generateUID() {
-  return Date.now() .toString( 36)  + Math.random() .toString( 36) .substring( 2, 11) ;
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 11) ;
 };
 
 /**
@@ -67,71 +74,70 @@ function validateEmail(email) {
  * just add new task, who add task then give lil task a credential
  * property is user_id with value is user.id
  */
-var users, user, listTask
+let users, user, listTasks;
 window.addEventListener('DOMContentLoaded', function() {
   const rememberedUser = JSON.parse(localStorage.getItem("rememberedUser"));
   const currentSessionUser = JSON.parse(sessionStorage.getItem("currentSessionUser"));
   if (rememberedUser || currentSessionUser) {
     // display page Login / Signup to none
-    mainForm.style.display = 'none';
+    mainForm.style.display = valueConstant.none;
     // display toDoApp
-    mainContent.style.display = 'block';
+    mainContent.style.display = valueConstant.block;
     // loading current user & toDoTask ( when using react => useEffect())
     user = rememberedUser || currentSessionUser;
     users = loadUsers() ;
-    helloUser(user)
-    listTask= loadTask(user) ;
-    renderTask(listTask);
+    checkUserIsOnline(user);
+    listTasks = loadTaskList(user) ;
+    renderListTasks(listTasks);
   } else {
     users = loadUsers() ;
-    helloUser(user);
+    checkUserIsOnline(user);
   }
 }) ;
 
 function loadUsers() {
-  var users = JSON.parse( localStorage.getItem('users') ||'[]') ;
+  var users = JSON.parse(localStorage.getItem('users') ||'[]') ;
   return users;
 };
 
-function helloUser(user = '') {
+function checkUserIsOnline(user = valueConstant.null) {
   if (user) {
-    notifUser.style.display = 'flex';
-    logoutBtn.classList.add( 'active') ;
+    notifUser.style.display = valueConstant.flex;
+    logoutBtn.classList.add(valueConstant.active);
     userActive.innerHTML = user?.email;
   } else {
-    notifUser.style.display = 'none';
-    logoutBtn.classList.remove( 'active') ;
-    userActive.innerHTML = '';
+    notifUser.style.display = valueConstant.none;
+    logoutBtn.classList.remove(valueConstant.active);
+    userActive.innerHTML = valueConstant.null;
   }
 }
 
-function loadTask() {
-  var listTask = JSON.parse(localStorage.getItem('listTask')  || '[]') ;
-  return listTask;
+function loadTaskList() {
+  var listTasks = JSON.parse(localStorage.getItem('listTasks')  || '[]') ;
+  return listTasks;
 };
 
 /**
  * Depend on filterStatus value, we choose task to render!
  */
 filterStatus.addEventListener('change',function() {
-  const filterStatusValue = filterStatus.value
-  console.log(filterStatusValue)
+  const filterStatusValue = filterStatus.value;
   if (filterStatusValue === filterState.DONE) {
-    renderTask(listTask.filter((task) =>
-      task.completed === filterState.DONE))
+    renderListTasks(listTasks.filter((task) =>
+      task.completed === filterState.DONE));
   } else if (filterStatusValue === filterState.UNDONE) {
-    renderTask(listTask.filter((task) => 
-      task.completed === filterState.UNDONE))
+    renderListTasks(listTasks.filter((task) => 
+      task.completed === filterState.UNDONE));
   } else {
-    renderTask(listTask)
+    renderListTasks(listTasks);
   }
 })
 
-function renderTask(listTask) {
-  if (listTask) {
-    var tasks = listTask.filter( 
+function renderListTasks(listTasks) {
+  if (listTasks) {
+    var tasks = listTasks.filter( 
       (task) => task.user_id === user.id
-   ) ;
+   );
   }
   pendingTasksCount.textContent = tasks?.length || 0;
   if (tasks?.length > 0) {
@@ -139,7 +145,7 @@ function renderTask(listTask) {
       return `<li>
           <div class="id-${item.id}">
             <input onchange="toggleCompleted('${item.id}')" 
-            type="checkbox" ${item.completed == filterState.DONE ? 'checked' : '' }>
+            type="checkbox" ${item.completed == filterState.DONE ? 'checked' : valueConstant.null }>
             <p>${item.name}</p>
             <span class ="icon icon-edit" onclick="editTask('${item.id}') ">
               <i class="fa-solid fa-pen-to-square"></i>
@@ -150,25 +156,25 @@ function renderTask(listTask) {
           </div>
         </li>`
     })
-    .join('');
-    deleteAllBtn.classList.add('active')
+    .join(valueConstant.null);
+    deleteAllBtn.classList.add(valueConstant.active);
   } else {
-    todoList.innerHTML = `Nothing to show here. Please add task`
-    deleteAllBtn.classList.remove('active')
+    todoList.innerHTML = `Nothing to show here. Please add task`;
+    deleteAllBtn.classList.remove(valueConstant.active);
 
   }
 }
 
 function toggleCompleted(id) {
-  const task = listTask.find((task) => task.id === id)
+  const task = listTasks.find((task) => task.id === id);
   if (task) {
     if(task.completed === filterState.UNDONE){
-      task.completed = filterState.DONE
+      task.completed = filterState.DONE;
     } else if(task.completed === filterState.DONE) {
-      task.completed = filterState.UNDONE
+      task.completed = filterState.UNDONE;
     }
-    localStorage.setItem('listTask', JSON.stringify(listTask))
-    listTask = loadTask(user)
+    localStorage.setItem('listTasks', JSON.stringify(listTasks));
+    listTasks = loadTaskList(user);
     filterStatus.value = filterState.ALL;
     filterStatus.dispatchEvent(new Event('change'));
     
@@ -176,160 +182,160 @@ function toggleCompleted(id) {
 }
 
 function deleteTask(id) {
-  const updatedListTask = listTask.filter((task) => task.id !== id)
-  if (updatedListTask)  {
-    localStorage.setItem('listTask', JSON.stringify(updatedListTask));
-    listTask = loadTask(user);
-    renderTask(listTask)
+  const updatedlistTasks = listTasks.filter((task) => task.id !== id);
+  if (updatedlistTasks)  {
+    localStorage.setItem('listTasks', JSON.stringify(updatedlistTasks));
+    listTasks = loadTaskList(user);
+    renderListTasks(listTasks);
   }
 };
 
 function editTask(id) {
   const todoItem = $(`.id-${id}`) ;
-  const task = listTask.find((task) => task.id === id) ;
+  const task = listTasks.find((task) => task.id === id) ;
   if (task) {
     const existingValue = task.name;
     //create input field by using document.createElement( 'input')
-    const inputElement = document.createElement('input') ; 
+    const inputElement = document.createElement('input'); 
     // Assign value of the input field exactly the name task
     inputElement.value = existingValue;
     // replace input field in place name for user change
     todoItem.replaceWith(inputElement) ;
-    inputElement.focus() ;
+    inputElement.focus();
     /**
      *  blur trigger when mouse point out of element 
      *  take the value in inputField and update
      */
     inputElement.addEventListener('blur', function() {
-      const updatedValue = inputElement.value.trim() ;
+      const updatedValue = inputElement.value.trim();
       if (updatedValue)  {
         task.name = updatedValue;
-        localStorage.setItem(  'listTask', JSON.stringify( listTask) ) ;
-        listTask = loadTask(user) ;
-        renderTask(listTask)
+        localStorage.setItem('listTasks', JSON.stringify(listTasks)) ;
+        listTasks = loadTaskList(user) ;
+        renderListTasks(listTasks);
       }
-    }) ;
+    });
   }
 };
 
 deleteAllBtn.addEventListener('click', function() {
-  if (confirm('Delete All?'))  {
-    var updatedListTask = listTask.filter( 
+  if (confirm('Delete All?')) {
+    var updatedlistTasks = listTasks.filter( 
       (task) => task.user_id !== user.id
     ) ;
-    if (updatedListTask)  {
+    if (updatedlistTasks) {
       imageChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
-      setTimeout( function() {
-        imageChibi.style.animation = '';
+      setTimeout(function() {
+        imageChibi.style.animation = valueConstant.null;
       }, 3100) ;
-      localStorage.setItem( 'listTask', JSON.stringify(updatedListTask))
-      listTask = loadTask(user)
-      renderTask(listTask)
+      localStorage.setItem('listTasks', JSON.stringify(updatedlistTasks));
+      listTasks = loadTaskList(user);
+      renderListTasks(listTasks);
     }
   }
-}) ;
+});
 
 registerForm.addEventListener('submit', function(event) {
-  event.preventDefault() ;
+  event.preventDefault();
 
-  if (pwdRegisterField.value != rePasswordField.value)  {
+  if (passwordRegisterField.value !== rePasswordRegisterField.value)  {
     alert('Please re-enter the password!') ;
-    pwdRegisterField.value = '';
-    rePasswordField.value = '';
+    passwordRegisterField.value = valueConstant.null;
+    rePasswordRegisterField.value = valueConstant.null;
     return;
   }
-  if (!validateEmail( emailInputRegister.value))  {
+  if (!validateEmail(emailInputRegister.value))  {
     alert('Please enter correctly email!') ;
-    emailInputRegister.value = '';
-    pwdRegisterField.value = '';
-    rePasswordField.value = '';
+    emailInputRegister.value = valueConstant.null;
+    passwordRegisterField.value = valueConstant.null;
+    rePasswordRegisterField.value = valueConstant.null;
     return;
   }
   const userCheck = users.find( 
-    (user)  => user.email == emailInputRegister.value
-  ) ;
+    (user)  => user.email === emailInputRegister.value
+  );
   if (userCheck)  {
     alert('Already have this email registered!') ;
-    emailInputRegister.value = '';
-    pwdRegisterField.value = '';
-    rePasswordField.value = '';
+    emailInputRegister.value = valueConstant.null;
+    passwordRegisterField.value = valueConstant.null;
+    rePasswordRegisterField.value = valueConstant.null;
     return;
   }
 
   const newUser = {
-    id: generateUID() ,
+    id: generateUID(),
     email: emailInputRegister.value,
-    password: pwdRegisterField.value,
+    password: passwordRegisterField.value,
   };
   users.push(newUser) ;
-  localStorage.setItem('users', JSON.stringify( users) ) ;
+  localStorage.setItem('users', JSON.stringify( users)) ;
   alert('Register success!') ;
-  emailInputRegister.value = '';
-  pwdRegisterField.value = '';
-  rePasswordField.value = '';
-  linkChangeFormRegister.click() ;
-}) ;
+  emailInputRegister.value = valueConstant.null;
+  passwordRegisterField.value = valueConstant.null;
+  rePasswordRegisterField.value = valueConstant.null;
+  linkChangeFormRegister.click();
+});
 
 loginForm.addEventListener('submit', function(event) {
-  event.preventDefault() ;
-  if (!validateEmail( emailInputLogin.value))  {
-    alert('Please enter correctly email!') ;
+  event.preventDefault();
+  if (!validateEmail(emailInputLogin.value)) {
+    alert('Please enter correctly email!');
     return;
   }
   // check if the user found in database => fetch api in here
-  var userCheck = users.find ( 
-    (user)  =>
-      user.email == emailInputLogin.value &&
-      user.password == passwordLoginField.value
-  ) ;
+  var userCheck = users.find( 
+    (user) =>
+      user.email === emailInputLogin.value &&
+      user.password === passwordLoginField.value
+  );
   if (userCheck)  {
     user = userCheck
-    if (rememberCheck.checked)  {
+    if (rememberCheck.checked) {
       localStorage.setItem('rememberedUser', JSON.stringify(user)) ;
       sessionStorage.removeItem('currentSessionUser');
     } else {
-      sessionStorage.setItem('currentSessionUser', JSON.stringify(user))
+      sessionStorage.setItem('currentSessionUser', JSON.stringify(user));
       localStorage.removeItem('rememberedUser');
     }
     imageChibi.style.animation = 'chibi-jumping 3s linear 0s 1 normal none';
     setTimeout(function() {
-      imageChibi.style.animation = '';
-    } , 3100) ;
-    mainForm.style.display = 'none';
-    mainContent.style.display = 'block';
-    passwordLoginField.value = '';
-    helloUser(user);
-    listTask = loadTask(user) ;
-    renderTask(listTask)
+      imageChibi.style.animation = valueConstant.null;
+    }, 3100) ;
+    mainForm.style.display = valueConstant.none;
+    mainContent.style.display = valueConstant.block;
+    passwordLoginField.value = valueConstant.null;
+    checkUserIsOnline(user);
+    listTasks = loadTaskList(user) ;
+    renderListTasks(listTasks)
   } else {
-    alert('User not found or Email/Password incorrect!' ) ;
-    emailInputLogin.value = '';
-    passwordLoginField.value = '';
+    alert('User not found or Email/Password incorrect!');
+    emailInputLogin.value = valueConstant.null;
+    passwordLoginField.value = valueConstant.null;
     return;
   }
 }) ;
 
 function checkAvailableFormAndDisplay() {
-  if (registerForm.style.display !== 'none')  {
-    registerForm.style.display = 'none';
-    askUserRegister.style.display = 'none';
-    loginForm.style.display = 'flex';
-    askUserLogin.style.display = 'flex';
+  if (registerForm.style.display !== valueConstant.none) {
+    registerForm.style.display = valueConstant.none;
+    askUserRegister.style.display = valueConstant.none;
+    loginForm.style.display = valueConstant.flex;
+    askUserLogin.style.display = valueConstant.flex;
   } else {
-    loginForm.style.display = 'none';
-    askUserLogin.style.display = 'none';
-    registerForm.style.display = 'flex';
-    askUserRegister.style.display = 'flex';
+    loginForm.style.display = valueConstant.none;
+    askUserLogin.style.display = valueConstant.none;
+    registerForm.style.display = valueConstant.flex;
+    askUserRegister.style.display = valueConstant.flex;
   }
 }
 
 linkChangeFormRegister.addEventListener('click', function() {
-  checkAvailableFormAndDisplay()
-}) ;
+  checkAvailableFormAndDisplay();
+});
 
 linkChangeFormLogin.addEventListener('click', function() {
-  checkAvailableFormAndDisplay()
-}) ;
+  checkAvailableFormAndDisplay();
+});
 
 /**
  * CSS class active make field input beautiful
@@ -337,16 +343,16 @@ linkChangeFormLogin.addEventListener('click', function() {
 inputTodo.addEventListener('keyup', function() {
   var enteredValues = inputTodo.value.trim() ;
   if (enteredValues) {
-    addTodoBtn.classList.add('active');
+    addTodoBtn.classList.add(valueConstant.active);
   } else {
-    addTodoBtn.classList.remove('active');
+    addTodoBtn.classList.remove(valueConstant.active);
   }
 });
 
 /**
  * Handle event click on button addTask
  */
-addTodoBtn.addEventListener( 'click', function() {
+addTodoBtn.addEventListener('click', function() {
   var todoValue = inputTodo.value.trim() ;
     var newTask = {
       id: generateUID(),
@@ -354,23 +360,23 @@ addTodoBtn.addEventListener( 'click', function() {
       user_id: user.id,
       completed: filterState.UNDONE
     };
-    listTask.push(newTask) ;
-    localStorage.setItem('listTask', JSON.stringify( listTask) ) ;
-    addTodoBtn.classList.remove('active') ;
+    listTasks.push(newTask);
+    localStorage.setItem('listTasks', JSON.stringify(listTasks)) ;
+    addTodoBtn.classList.remove(valueConstant.active);
     imageChibi.style.animation = 'chibi-swinging 3s linear 0s 1 normal none';
     setTimeout(function() {
-      imageChibi.style.animation = '';
+      imageChibi.style.animation = valueConstant.null;
     }, 3100) ;
-    inputTodo.value = '';
-    listTask = loadTask(user) ;
-    renderTask(listTask)
-}) ;
+    inputTodo.value = valueConstant.null;
+    listTasks = loadTaskList(user) ;
+    renderListTasks(listTasks)
+});
 
 logoutBtn.addEventListener('click', function() {
   localStorage.removeItem('rememberedUser');
   sessionStorage.removeItem('currentSessionUser');
-  user = ''
-  helloUser();
-  mainForm.style.display = 'flex';
-  mainContent.style.display = 'none';
+  user = valueConstant.null
+  checkUserIsOnline();
+  mainForm.style.display = valueConstant.flex;
+  mainContent.style.display = valueConstant.none;
 }) ;

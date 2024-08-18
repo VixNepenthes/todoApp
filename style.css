@@ -23,6 +23,7 @@
     bottom: 0px;
   }
 }
+
 @keyframes chibi-swinging {
   0% {
     transform: rotate(0deg);
@@ -40,6 +41,7 @@
     transform: rotate(0deg);
   }
 }
+
 @keyframes chibi-angrying {
   0% {
     bottom: 50px;
@@ -84,7 +86,6 @@ body {
   background: linear-gradient(to bottom, #ccee42 0%, #497be8 100%);
 }
 
-
 .container {
   background: #fff;
   max-width: 800px;
@@ -98,6 +99,7 @@ body {
   min-height: 500px;
   max-height: 500px;
 }
+
 .main-form {
   display: flex;
   flex-direction: column;
@@ -114,9 +116,11 @@ body {
   margin-bottom: 50px;
   min-width: 250px;
 }
+
 .notif-user p {
   animation: videv-colortransform 5s linear infinite alternate;
 }
+
 #logout-btn {
   border: none;
   background: #8e49e8;
@@ -136,9 +140,11 @@ body {
   pointer-events: none;
   transition: all 0.3s ease;
 }
+
 #logout-btn::hover {
   background: #721ce3;
 }
+
 #logout-btn.active {
   opacity: 1;
   pointer-events: auto;
@@ -151,6 +157,7 @@ body {
   padding: 20px;
   min-height: 440px;
 }
+
 #form-login {
   display: none;
 }
@@ -274,6 +281,7 @@ input[type='password'] {
 .input-todo input:focus {
   border-color: #8e49e8;
 }
+
 #add-task-btn {
   width: 50px;
   height: 100%;
@@ -289,21 +297,26 @@ input[type='password'] {
   pointer-events: none;
   transition: all 0.3s ease;
 }
+
 #add-task-btn:hover,
 .footer button:hover {
   background: #721ce3;
 }
+
 #add-task-btn.active {
   opacity: 1;
   pointer-events: auto;
 }
+
 .wrapper .todo-list {
   max-height: 250px;
   overflow-y: auto;
 }
+
 .todo-list {
   min-width: 100%;
 }
+
 .todo-list li {
   position: relative;
   list-style: none;
@@ -324,12 +337,15 @@ input[type=checkbox] {
 .todo-list div {
   display: flex;
 }
+
 .todo-list li input{
   font-size: 18px;
 }
+
 .todo-list li p{
   margin-left: 20px;
 }
+
 .todo-list li .icon {
   position: absolute;
   right: -45px;
@@ -348,12 +364,15 @@ input[type=checkbox] {
 .todo-list li .icon.icon-edit {
   background: #497be8;
 }
+
 .todo-list li:hover .icon {
   right: 0px;
 }
+
 .todo-list li:hover .icon.icon-edit {
   right: 45px;
 }
+
 .wrapper .footer {
   display: flex;
   width: 100%;
@@ -362,13 +381,15 @@ input[type=checkbox] {
   justify-content: space-between;
   flex-direction: column;
 }
+
 .footer__pending-task{
   display: flex;
 }
+
 .footer__filter{
   font-size: 18px;
-  
 }
+
 #delete-alltask-btn {
   padding: 6px 10px;
   border-radius: 3px;
@@ -385,6 +406,7 @@ input[type=checkbox] {
   pointer-events: none;
   transition: all 0.3s ease;
 }
+
 #delete-alltask-btn.active {
   opacity: 1;
   pointer-events: auto;
