@@ -1,7 +1,7 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
-const loginBtn = $('#btn-login');
-const registerBtn = $('#btn-register');
+const loginButton = $('#button-login');
+const registerButton = $('#button-register');
 const registerForm = $('#form-register');
 const loginForm = $('#form-login') ;
 const mainForm = $('.main-form') ;
@@ -10,19 +10,19 @@ const linkChangeFormRegister = $('#link-change-form-register') ;
 const linkChangeFormLogin = $('#link-change-form-login') ;
 const askUserRegister = $('#ask-user-register') ;
 const askUserLogin = $('#ask-user-login') ;
-const rememberCheck = $('#rememberme') ;
+const rememberCheck = $('#remember-me') ;
 const emailInputLogin = $('#email-login') ;
 const passwordLoginField = $('#password-login') ;
 const emailInputRegister = $('#email-register') ;
 const passwordRegisterField = $('#password-register') ;
 const rePasswordRegisterField = $('#re-password-register') ;
 const imageChibi = $('.img-form') ;
-const notifUser = $('.notif-user') ;
+const notificationUser = $('.notification-user') ;
 const userActive = $('#user-active') ;
-const logoutBtn = $('#logout-btn') ;
+const logoutButton = $('#logout-button') ;
 const inputTodo = $('.input-todo input') ;
-const addTodoBtn = $('.input-todo button') ;
-const deleteAllBtn = $('#delete-alltask-btn') ;
+const addTodoButton = $('.input-todo button') ;
+const deleteAllTasksButton = $('#delete-all-tasks-button') ;
 const pendingTasksCount = $( '.pending-task') ;
 const todoList = $('.todo-list') ;
 const filterStatus = $('#filter');
@@ -38,6 +38,7 @@ const valueConstant = {
   flex: 'flex',
   active: 'active'
 }
+const urlAPI = 'http://localhost:3000'
 
 /**
  * 
@@ -74,8 +75,21 @@ function validateEmail(email) {
  * just add new task, who add task then give lil task a credential
  * property is user_id with value is user.id
  */
-let users, user, listTasks;
-window.addEventListener('DOMContentLoaded', function() {
+
+// fetch('http://localhost:3000/task', {
+//   headers: {
+//     authorization : 23523523,
+//   },
+// })
+// .then(response => response.json())
+// .then(data => {
+//   console.log(data) // Prints result from `response.json()` in getRequest
+// })
+// .catch(error => console.error(error))
+
+let users, user;
+let listTasks = [];
+ window.addEventListener('DOMContentLoaded', async function() {
   const rememberedUser = JSON.parse(localStorage.getItem("rememberedUser"));
   const currentSessionUser = JSON.parse(sessionStorage.getItem("currentSessionUser"));
   if (rememberedUser || currentSessionUser) {
@@ -84,37 +98,46 @@ window.addEventListener('DOMContentLoaded', function() {
     // display toDoApp
     mainContent.style.display = valueConstant.block;
     // loading current user & toDoTask ( when using react => useEffect())
-    user = rememberedUser || currentSessionUser;
-    users = loadUsers() ;
+    user = rememberedUser || currentSessionUser || '';
     checkUserIsOnline(user);
-    listTasks = loadTaskList(user) ;
+    listTasks = await loadTaskList();
     renderListTasks(listTasks);
   } else {
-    users = loadUsers() ;
     checkUserIsOnline(user);
   }
 }) ;
 
 function loadUsers() {
-  var users = JSON.parse(localStorage.getItem('users') ||'[]') ;
-  return users;
 };
 
 function checkUserIsOnline(user = valueConstant.null) {
-  if (user) {
-    notifUser.style.display = valueConstant.flex;
-    logoutBtn.classList.add(valueConstant.active);
-    userActive.innerHTML = user?.email;
-  } else {
-    notifUser.style.display = valueConstant.none;
-    logoutBtn.classList.remove(valueConstant.active);
+  if (user == valueConstant.null) {
+    notificationUser.style.display = valueConstant.none;
+    logoutButton.classList.remove(valueConstant.active);
     userActive.innerHTML = valueConstant.null;
+  } else {
+    notificationUser.style.display = valueConstant.flex;
+    logoutButton.classList.add(valueConstant.active);
+    userActive.innerHTML = user?.email;
   }
 }
 
-function loadTaskList() {
-  var listTasks = JSON.parse(localStorage.getItem('listTasks')  || '[]') ;
-  return listTasks;
+async function loadTaskList() {
+  try {
+    const response = await fetch(`${urlAPI}/task`, {
+      method: 'GET',
+      headers : {
+        authorization : JSON.parse(localStorage.getItem('Authorization'))
+      }
+    })
+    if(!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    let listTasks = await response.json();
+    return listTasks
+  } catch (error) {
+    console.error(error)
+  }
 };
 
 /**
@@ -134,10 +157,11 @@ filterStatus.addEventListener('change',function() {
 })
 
 function renderListTasks(listTasks) {
+  let tasks;
   if (listTasks) {
-    var tasks = listTasks.filter( 
+    tasks = listTasks.filter( 
       (task) => task.user_id === user.id
-   );
+    );
   }
   pendingTasksCount.textContent = tasks?.length || 0;
   if (tasks?.length > 0) {
@@ -157,36 +181,56 @@ function renderListTasks(listTasks) {
         </li>`
     })
     .join(valueConstant.null);
-    deleteAllBtn.classList.add(valueConstant.active);
+    deleteAllTasksButton.classList.add(valueConstant.active);
   } else {
     todoList.innerHTML = `Nothing to show here. Please add task`;
-    deleteAllBtn.classList.remove(valueConstant.active);
+    deleteAllTasksButton.classList.remove(valueConstant.active);
 
   }
 }
 
-function toggleCompleted(id) {
-  const task = listTasks.find((task) => task.id === id);
-  if (task) {
-    if(task.completed === filterState.UNDONE){
-      task.completed = filterState.DONE;
-    } else if(task.completed === filterState.DONE) {
-      task.completed = filterState.UNDONE;
-    }
-    localStorage.setItem('listTasks', JSON.stringify(listTasks));
-    listTasks = loadTaskList(user);
-    filterStatus.value = filterState.ALL;
-    filterStatus.dispatchEvent(new Event('change'));
-    
+async function toggleCompleted(id) {
+  const response = await fetch(`${urlAPI}/task/toggle-task`, {
+    method: 'PUT',
+    headers : {
+      authorization : JSON.parse(localStorage.getItem('Authorization'))
+    },
+    body : JSON.stringify(id)
+  })
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
   }
+  listTasks = loadTaskList();
+  renderListTasks(listTasks);
+  filterStatus.value = filterState.ALL;
+  filterStatus.dispatchEvent(new Event('change'));
+  // const task = listTasks.find((task) => task.id === id);
+  // if (task) {
+  //   if(task.completed === filterState.UNDONE){
+  //     task.completed = filterState.DONE;
+  //   } else if(task.completed === filterState.DONE) {
+  //     task.completed = filterState.UNDONE;
+  //   }
+  //   localStorage.setItem('listTasks', JSON.stringify(listTasks));
+  //   listTasks = loadTaskList(user);
+  //   filterStatus.value = filterState.ALL;
+  //   filterStatus.dispatchEvent(new Event('change'));
 }
 
-function deleteTask(id) {
-  const updatedlistTasks = listTasks.filter((task) => task.id !== id);
-  if (updatedlistTasks)  {
-    localStorage.setItem('listTasks', JSON.stringify(updatedlistTasks));
-    listTasks = loadTaskList(user);
-    renderListTasks(listTasks);
+async function deleteTask(id) {
+  const response = await fetch(`${urlAPI}/task`, {
+    method: 'DELETE',
+    headers : {
+      authorization : JSON.parse(localStorage.getItem('Authorization'))
+    },
+    body : JSON.stringify(id)
+  })
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  } else {
+    alert(await response.json())
+    listTasks = await loadTaskList()
+    renderListTasks(listTasks)
   }
 };
 
@@ -206,29 +250,40 @@ function editTask(id) {
      *  blur trigger when mouse point out of element 
      *  take the value in inputField and update
      */
-    inputElement.addEventListener('blur', function() {
+    inputElement.addEventListener('blur', async function() {
       const updatedValue = inputElement.value.trim();
       if (updatedValue)  {
         task.name = updatedValue;
-        localStorage.setItem('listTasks', JSON.stringify(listTasks)) ;
-        listTasks = loadTaskList(user) ;
-        renderListTasks(listTasks);
+        const response = await fetch(`${urlAPI}/task`, {
+          method: 'PUT',
+          headers : {
+            authorization : JSON.parse(localStorage.getItem('Authorization'))
+          },
+          body : JSON.stringify(task)
+        })
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        } else {
+          alert(await response.json())
+          listTasks = await loadTaskList()
+          renderListTasks(listTasks)
+        }
       }
     });
   }
 };
 
-deleteAllBtn.addEventListener('click', function() {
+deleteAllTasksButton.addEventListener('click', function() {
   if (confirm('Delete All?')) {
-    var updatedlistTasks = listTasks.filter( 
+    let updatedListTasks = listTasks.filter( 
       (task) => task.user_id !== user.id
     ) ;
-    if (updatedlistTasks) {
+    if (updatedListTasks) {
       imageChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
       setTimeout(function() {
         imageChibi.style.animation = valueConstant.null;
       }, 3100) ;
-      localStorage.setItem('listTasks', JSON.stringify(updatedlistTasks));
+      localStorage.setItem('listTasks', JSON.stringify(updatedListTasks));
       listTasks = loadTaskList(user);
       renderListTasks(listTasks);
     }
@@ -238,12 +293,6 @@ deleteAllBtn.addEventListener('click', function() {
 registerForm.addEventListener('submit', function(event) {
   event.preventDefault();
 
-  if (passwordRegisterField.value !== rePasswordRegisterField.value)  {
-    alert('Please re-enter the password!') ;
-    passwordRegisterField.value = valueConstant.null;
-    rePasswordRegisterField.value = valueConstant.null;
-    return;
-  }
   if (!validateEmail(emailInputRegister.value))  {
     alert('Please enter correctly email!') ;
     emailInputRegister.value = valueConstant.null;
@@ -251,29 +300,46 @@ registerForm.addEventListener('submit', function(event) {
     rePasswordRegisterField.value = valueConstant.null;
     return;
   }
-  const userCheck = users.find( 
-    (user)  => user.email === emailInputRegister.value
-  );
-  if (userCheck)  {
-    alert('Already have this email registered!') ;
-    emailInputRegister.value = valueConstant.null;
+
+  if (passwordRegisterField.value.length < 8) {
+    alert('Please enter password with the minimum length is 8 character');
+    passwordRegisterField.value = valueConstant.null;
+    rePasswordRegisterField.value = valueConstant.null;
+  }
+
+  if (passwordRegisterField.value !== rePasswordRegisterField.value)  {
+    alert('Please re-enter the password!');
     passwordRegisterField.value = valueConstant.null;
     rePasswordRegisterField.value = valueConstant.null;
     return;
   }
 
-  const newUser = {
-    id: generateUID(),
+  let newUser = {
     email: emailInputRegister.value,
-    password: passwordRegisterField.value,
-  };
-  users.push(newUser) ;
-  localStorage.setItem('users', JSON.stringify( users)) ;
-  alert('Register success!') ;
-  emailInputRegister.value = valueConstant.null;
-  passwordRegisterField.value = valueConstant.null;
-  rePasswordRegisterField.value = valueConstant.null;
-  linkChangeFormRegister.click();
+    password: passwordRegisterField.value
+  }
+
+  fetch(`${urlAPI}/users`, {
+    method: 'POST',
+    body: JSON.stringify(newUser)
+  })
+  .then(response => response.json())
+  .then(message => {
+    if (message === 'Already have this email registered!') {
+      alert('Already have this email registered!') ;
+      emailInputRegister.value = valueConstant.null;
+      passwordRegisterField.value = valueConstant.null;
+      rePasswordRegisterField.value = valueConstant.null;
+      return;
+    }
+    else {
+      alert('Register success!');
+      emailInputRegister.value = valueConstant.null;
+      passwordRegisterField.value = valueConstant.null;
+      rePasswordRegisterField.value = valueConstant.null;
+      linkChangeFormRegister.click();
+    }
+  })
 });
 
 loginForm.addEventListener('submit', function(event) {
@@ -283,36 +349,44 @@ loginForm.addEventListener('submit', function(event) {
     return;
   }
   // check if the user found in database => fetch api in here
-  var userCheck = users.find( 
-    (user) =>
-      user.email === emailInputLogin.value &&
-      user.password === passwordLoginField.value
-  );
-  if (userCheck)  {
-    user = userCheck
-    if (rememberCheck.checked) {
-      localStorage.setItem('rememberedUser', JSON.stringify(user)) ;
-      sessionStorage.removeItem('currentSessionUser');
-    } else {
-      sessionStorage.setItem('currentSessionUser', JSON.stringify(user));
-      localStorage.removeItem('rememberedUser');
-    }
-    imageChibi.style.animation = 'chibi-jumping 3s linear 0s 1 normal none';
-    setTimeout(function() {
-      imageChibi.style.animation = valueConstant.null;
-    }, 3100) ;
-    mainForm.style.display = valueConstant.none;
-    mainContent.style.display = valueConstant.block;
-    passwordLoginField.value = valueConstant.null;
-    checkUserIsOnline(user);
-    listTasks = loadTaskList(user) ;
-    renderListTasks(listTasks)
-  } else {
-    alert('User not found or Email/Password incorrect!');
-    emailInputLogin.value = valueConstant.null;
-    passwordLoginField.value = valueConstant.null;
-    return;
+  const userLoginData = {
+    email: emailInputLogin.value,
+    password: passwordLoginField.value
   }
+  fetch(`${urlAPI}/users/login`, {
+    method: 'POST',
+    body : JSON.stringify(userLoginData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data !== 'Wrong user or password') {
+      user = data.user
+      if (rememberCheck.checked) {
+        localStorage.setItem('rememberedUser', JSON.stringify(user)) ;
+        sessionStorage.removeItem('currentSessionUser');
+      } else {
+        sessionStorage.setItem('currentSessionUser', JSON.stringify(user));
+        localStorage.removeItem('rememberedUser');
+      }
+      localStorage.setItem('Authorization', JSON.stringify(data.token))
+      imageChibi.style.animation = 'chibi-jumping 3s linear 0s 1 normal none';
+      setTimeout(function() {
+        imageChibi.style.animation = valueConstant.null;
+      }, 3100) ;
+      mainForm.style.display = valueConstant.none;
+      mainContent.style.display = valueConstant.block;
+      passwordLoginField.value = valueConstant.null;
+      checkUserIsOnline(user);
+      listTasks = loadTaskList() ;
+      renderListTasks(listTasks)
+
+    } else {
+      alert('User not found or Email/Password incorrect!');
+      emailInputLogin.value = valueConstant.null;
+      passwordLoginField.value = valueConstant.null;
+      return;
+    }
+  })
 }) ;
 
 function checkAvailableFormAndDisplay() {
@@ -341,38 +415,47 @@ linkChangeFormLogin.addEventListener('click', function() {
  * CSS class active make field input beautiful
  */
 inputTodo.addEventListener('keyup', function() {
-  var enteredValues = inputTodo.value.trim() ;
+  let enteredValues = inputTodo.value.trim() ;
   if (enteredValues) {
-    addTodoBtn.classList.add(valueConstant.active);
+    addTodoButton.classList.add(valueConstant.active);
   } else {
-    addTodoBtn.classList.remove(valueConstant.active);
+    addTodoButton.classList.remove(valueConstant.active);
   }
 });
 
 /**
  * Handle event click on button addTask
  */
-addTodoBtn.addEventListener('click', function() {
-  var todoValue = inputTodo.value.trim() ;
-    var newTask = {
-      id: generateUID(),
-      name: todoValue,
-      user_id: user.id,
-      completed: filterState.UNDONE
-    };
-    listTasks.push(newTask);
-    localStorage.setItem('listTasks', JSON.stringify(listTasks)) ;
-    addTodoBtn.classList.remove(valueConstant.active);
-    imageChibi.style.animation = 'chibi-swinging 3s linear 0s 1 normal none';
-    setTimeout(function() {
-      imageChibi.style.animation = valueConstant.null;
-    }, 3100) ;
-    inputTodo.value = valueConstant.null;
-    listTasks = loadTaskList(user) ;
-    renderListTasks(listTasks)
+addTodoButton.addEventListener('click', async function() {
+  let todoValue = inputTodo.value.trim();
+  let newTask = {
+    name: todoValue,
+    user_id: user.id,
+    completed: filterState.UNDONE
+  };
+    const response = await fetch(`${urlAPI}/task`, {
+      method:'POST',
+      headers: {
+        authorization: JSON.parse(localStorage.getItem('Authorization'))
+      },
+      body : JSON.stringify(newTask)
+    })
+    if(!response.ok) {
+      throw new Error('Network response was not ok');
+    } else {
+      addTodoButton.classList.remove(valueConstant.active);
+      imageChibi.style.animation = 'chibi-swinging 3s linear 0s 1 normal none';
+      setTimeout(function() {
+        imageChibi.style.animation = valueConstant.null;
+      }, 3100) ;
+      inputTodo.value = valueConstant.null;
+      listTasks = await loadTaskList() ;
+      renderListTasks(listTasks)
+    }
+    
 });
 
-logoutBtn.addEventListener('click', function() {
+logoutButton.addEventListener('click', function() {
   localStorage.removeItem('rememberedUser');
   sessionStorage.removeItem('currentSessionUser');
   user = valueConstant.null

@@ -109,7 +109,7 @@ body {
   border: 1px solid black;
 }
 
-.notif-user {
+.notification-user {
   align-self: flex-start;
   align-items: center;
   display: flex;
@@ -117,11 +117,11 @@ body {
   min-width: 250px;
 }
 
-.notif-user p {
+.notification-user p {
   animation: videv-colortransform 5s linear infinite alternate;
 }
 
-#logout-btn {
+#logout-button {
   border: none;
   background: #8e49e8;
   color: white;
@@ -141,11 +141,11 @@ body {
   transition: all 0.3s ease;
 }
 
-#logout-btn::hover {
+#logout-button::hover {
   background: #721ce3;
 }
 
-#logout-btn.active {
+#logout-button.active {
   opacity: 1;
   pointer-events: auto;
 }
@@ -181,7 +181,7 @@ input[type='password'] {
   align-items: center;
 }
 
-#rememberme-checkbox {
+#remember-me-checkbox {
   align-self: flex-start;
 }
 
@@ -201,7 +201,7 @@ input[type='password'] {
   left: 50px;
 }
 
-.btn-submit {
+.button-submit {
   margin-top: 20px;
   min-width: 80px;
   background-color: #ccee42;
@@ -211,7 +211,7 @@ input[type='password'] {
   cursor: pointer;
   width: 100%;
 }
-.btn-submit:hover {
+.button-submit:hover {
   opacity: 0.8;
 }
 
@@ -282,7 +282,7 @@ input[type='password'] {
   border-color: #8e49e8;
 }
 
-#add-task-btn {
+#add-task-button {
   width: 50px;
   height: 100%;
   border: none;
@@ -298,12 +298,12 @@ input[type='password'] {
   transition: all 0.3s ease;
 }
 
-#add-task-btn:hover,
+#add-task-button:hover,
 .footer button:hover {
   background: #721ce3;
 }
 
-#add-task-btn.active {
+#add-task-button.active {
   opacity: 1;
   pointer-events: auto;
 }
@@ -390,7 +390,7 @@ input[type=checkbox] {
   font-size: 18px;
 }
 
-#delete-alltask-btn {
+#delete-all-tasks-button {
   padding: 6px 10px;
   border-radius: 3px;
   border: none;
@@ -407,7 +407,7 @@ input[type=checkbox] {
   transition: all 0.3s ease;
 }
 
-#delete-alltask-btn.active {
+#delete-alltask-button.active {
   opacity: 1;
   pointer-events: auto;
 }

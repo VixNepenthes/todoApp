@@ -38,11 +38,11 @@
             ><br />
             <input type="password" id="password-login" name="password" />
           </div>
-          <label id="rememberme-checkbox">
-            <input type="checkbox" value="isRememberme" id="rememberme" />
+          <label id="remember-me-checkbox">
+            <input type="checkbox" value="isRememberme" id="remember-me" />
             Remember me
           </label>
-          <button id="btn-login" class="btn-submit" type="submit">Login</button>
+          <button id="button-login" class="button-submit" type="submit">Login</button>
         </form>
         <form id="form-register" class="form-auth">
           <h1 class="title-form-register">Register</h1>
@@ -64,7 +64,7 @@
             ><br />
             <input type="password" id="re-password-register" name="re-password" />
           </div>
-          <button id="btn-register" class="btn-submit" type="submit">
+          <button id="button-register" class="button-submit" type="submit">
             Register
           </button>
         </form>
@@ -86,8 +86,8 @@
         <div class="wrapper">
           <header>Todo App</header>
           <div class="input-todo">
-            <input type="text" placeholder="Add task" />
-            <button id="add-task-btn"><i class="fas fa-plus"></i></button>
+            <input type="text" placeholder="Add task"/>
+            <button id="add-task-button"><i class="fas fa-plus"></i></button>
           </div>
           <ul class="todo-list">
             <!--data return from localStorage -->
@@ -97,7 +97,7 @@
               <span
                 >You have <span class="pending-task"></span> task</span
               >
-              <button id="delete-alltask-btn">Delete all</button>
+              <button id="delete-all-tasks-button">Delete all</button>
             </div>
             <div class="footer__filter">
               <label for="">filter :</label>
@@ -112,9 +112,9 @@
       </div>
       <!-- image for fun -->
       <div>
-        <div class="notif-user">
+        <div class="notification-user">
           <p>Hello user: <span id="user-active"></span></p>
-          <button id="logout-btn">
+          <button id="logout-button">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
           </button>
         </div>
