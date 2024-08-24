@@ -77,11 +77,10 @@ function renderListTasks(listTasks) {
 				return `<li>
           <div class="id-${item.id}">
             <input onchange="toggleCompleted('${item.id}')" 
-            type="checkbox" ${
-							item.completed == filterState.DONE
-								? 'checked'
-								: valueConstant.null
-						}>
+            type="checkbox" ${item.completed == filterState.DONE
+						? 'checked'
+						: valueConstant.null
+					}>
             <p>${item.name}</p>
             <span class ="icon icon-edit" onclick="editTask('${item.id}') ">
               <i class="fa-solid fa-pen-to-square"></i>
@@ -101,21 +100,26 @@ function renderListTasks(listTasks) {
 }
 
 async function toggleCompleted(id) {
-	const response = await fetch(`${urlAPI}/tasks/toggle-task`, {
-		method: 'PUT',
-		headers: {
-			authorization: JSON.parse(localStorage.getItem('Authorization')),
-		},
-		body: JSON.stringify(id),
-	});
-	if (!response.ok) {
-		throw new Error('Network response was not ok');
-	}
-	alert(await response.json());
-	await loadTaskList();
-	renderListTasks(listTasks);
-	filterStatus.value = filterState.ALL;
-	filterStatus.dispatchEvent(new Event('change'));
+	const xhr = new XMLHttpRequest();
+	xhr.open('PUT', `${urlAPI}/tasks/toggle-task`, false);
+	xhr.setRequestHeader('Authorization', JSON.parse(localStorage.getItem('Authorization')));
+	xhr.setRequestHeader('Content-type', 'application/json');
+	xhr.onload = function () {
+		if (xhr.status >= 200 && xhr.status <= 299) {
+			alert(JSON.parse(xhr.responseText));
+			loadTaskList().then(() => {
+				renderListTasks(listTasks);
+				filterStatus.value = filterState.ALL;
+				filterStatus.dispatchEvent(new Event('change'));
+			});
+		} else {
+			throw new Error('Network response was not ok');
+		}
+	};
+	xhr.onerror = function () {
+		throw new Error('Network request failed');
+	};
+	xhr.send(JSON.stringify(id));
 }
 
 async function deleteTask(id) {
@@ -178,27 +182,33 @@ function editTask(id) {
 	}
 }
 
-deleteAllTasksButton.addEventListener('click', async function () {
+deleteAllTasksButton.addEventListener('click', function () {
 	if (confirm('Delete All?')) {
-		const response = await fetch(`${urlAPI}/tasks/delete-all-tasks`, {
-			method: 'DELETE',
-			headers: {
-				authorization: JSON.parse(localStorage.getItem('Authorization')),
-			},
-			body: JSON.stringify(user.id),
-		});
-		if (!response.ok) {
-			throw new Error('Network response was not ok');
-		}
-		imageChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
-		setTimeout(function () {
-			imageChibi.style.animation = valueConstant.null;
-		}, 3100);
-		alert(await response.json());
-		await loadTaskList();
-		renderListTasks(listTasks);
+		const xhr = new XMLHttpRequest();
+		xhr.open('DELETE', `${urlAPI}/tasks/delete-all-tasks`, false);
+		xhr.setRequestHeader('Authorization', JSON.parse(localStorage.getItem('Authorization')));
+		xhr.setRequestHeader('Content-type', 'application/json');
+		xhr.onload = function () {
+			if (xhr.status >= 200 && xhr.status < 300) {
+				imageChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
+				setTimeout(function () {
+					imageChibi.style.animation = valueConstant.null;
+				}, 3100);
+				alert(JSON.parse(xhr.responseText));
+				loadTaskList().then(() => {
+					renderListTasks(listTasks);
+				});
+			} else {
+				throw new Error('Network response was not ok');
+			}
+		};
+		xhr.onerror = function () {
+			throw new Error('Network request failed');
+		};
+		xhr.send(JSON.stringify(user.id));
 	}
 });
+
 
 inputTodo.addEventListener('keyup', function () {
 	let enteredValues = inputTodo.value.trim();
