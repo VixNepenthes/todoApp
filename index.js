@@ -107,11 +107,6 @@ async function toggleCompleted(id) {
 	xhr.onload = function () {
 		if (xhr.status >= 200 && xhr.status <= 299) {
 			alert(JSON.parse(xhr.responseText));
-			loadTaskList().then(() => {
-				renderListTasks(listTasks);
-				filterStatus.value = filterState.ALL;
-				filterStatus.dispatchEvent(new Event('change'));
-			});
 		} else {
 			throw new Error('Network response was not ok');
 		}
@@ -120,6 +115,9 @@ async function toggleCompleted(id) {
 		throw new Error('Network request failed');
 	};
 	xhr.send(JSON.stringify(id));
+	await loadTaskList();
+	filterStatus.value = filterState.ALL;
+	filterStatus.dispatchEvent(new Event('change'));
 }
 
 async function deleteTask(id) {
@@ -182,7 +180,7 @@ function editTask(id) {
 	}
 }
 
-deleteAllTasksButton.addEventListener('click', function () {
+deleteAllTasksButton.addEventListener('click', async function () {
 	if (confirm('Delete All?')) {
 		const xhr = new XMLHttpRequest();
 		xhr.open('DELETE', `${urlAPI}/tasks/delete-all-tasks`, false);
@@ -190,14 +188,7 @@ deleteAllTasksButton.addEventListener('click', function () {
 		xhr.setRequestHeader('Content-type', 'application/json');
 		xhr.onload = function () {
 			if (xhr.status >= 200 && xhr.status < 300) {
-				imageChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
-				setTimeout(function () {
-					imageChibi.style.animation = valueConstant.null;
-				}, 3100);
 				alert(JSON.parse(xhr.responseText));
-				loadTaskList().then(() => {
-					renderListTasks(listTasks);
-				});
 			} else {
 				throw new Error('Network response was not ok');
 			}
@@ -206,6 +197,12 @@ deleteAllTasksButton.addEventListener('click', function () {
 			throw new Error('Network request failed');
 		};
 		xhr.send(JSON.stringify(user.id));
+		imageChibi.style.animation = 'chibi-angrying 1s linear 0s 1 normal none';
+		setTimeout(function () {
+			imageChibi.style.animation = valueConstant.null;
+		}, 3100);
+		await loadTaskList();
+		renderListTasks(listTasks);
 	}
 });
 
